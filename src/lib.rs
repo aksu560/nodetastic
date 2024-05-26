@@ -10,11 +10,23 @@ pub enum EdgeType {
     Undirected,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq)]
+#[derive(Copy, Clone, Debug)]
 pub struct Edge {
     nodes: [usize; 2],
     id: usize,
     edge_type: EdgeType,
+}
+
+impl PartialEq for Edge {
+    fn eq(&self, other: &Self) -> bool {
+        if self.nodes[0] == other.nodes[0] && self.nodes[1] == other.nodes[1] {
+            true
+        } else if self.edge_type == EdgeType::Undirected {
+            self.nodes[0] == other.nodes[1] && self.nodes[1] == other.nodes[0]
+        } else {
+            false
+        }
+    }
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -100,7 +112,7 @@ impl Graph {
         self.nodes[edge.nodes[1]]
             .edges
             .retain(|e| e.id != id);
-        self.edges.remove(id);
+        self.edges.swap_remove(id);
     }
 }
 
