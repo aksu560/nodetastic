@@ -104,17 +104,5 @@ impl Graph {
     }
 }
 
-pub struct WeightedEdge {
-    pub nodes: [usize; 2],
-    pub id: usize,
-    pub edge_type: EdgeType,
-    pub weight: f64,
-}
-
-pub struct WeightedGraph {
-    pub nodes: Vec<Node>,
-    pub edges: Vec<WeightedEdge>,
-}
-
 #[cfg(test)]
 mod test;
