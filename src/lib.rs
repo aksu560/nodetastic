@@ -4,13 +4,13 @@ pub struct Node {
     id: usize,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum EdgeType {
     Directed,
     Undirected,
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, Eq)]
 pub struct Edge {
     nodes: [usize; 2],
     id: usize,
