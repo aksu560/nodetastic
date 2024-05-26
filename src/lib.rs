@@ -1,6 +1,6 @@
 #[derive(Clone, Debug, PartialEq)]
 pub struct Node {
-    edges: Vec<Edge>,
+    edges: Vec<usize>,
     id: usize,
 }
 
@@ -10,6 +10,7 @@ pub enum EdgeType {
     Undirected,
 }
 
+#[allow(dead_code)]
 #[derive(Copy, Clone, Debug, Eq)]
 pub struct Edge {
     nodes: [usize; 2],
@@ -65,8 +66,8 @@ impl Graph {
             id,
             edge_type: EdgeType::Undirected,
         });
-        self.nodes[node1].edges.push(self.edges[id]);
-        self.nodes[node2].edges.push(self.edges[id]);
+        self.nodes[node1].edges.push(id);
+        self.nodes[node2].edges.push(id);
         id
     }
 
@@ -77,7 +78,7 @@ impl Graph {
             id,
             edge_type: EdgeType::Directed,
         });
-        self.nodes[node1].edges.push(self.edges[id]);
+        self.nodes[node1].edges.push(id);
         id
     }
 
@@ -93,26 +94,26 @@ impl Graph {
         self.nodes[node1]
             .edges
             .iter()
-            .find(|edge| edge.nodes.contains(&node2))
+            .map(|&edge_id| &self.edges[edge_id])
+            .find(|edge| edge.nodes.iter().any(|&node_id| node_id == node2))
     }
 
     pub fn remove_node(&mut self, id: usize) {
         self.nodes.remove(id);
-        for node in self.nodes.iter_mut() {
-            node.edges.retain(|edge| edge.nodes.iter().all(|&node_id| node_id != id));
+        for node in &mut self.nodes {
+            node.edges.retain(|&edge_id| {
+                let edge = &self.edges[edge_id];
+                edge.nodes.iter().all(|&node_id| node_id != id)
+            });
         }
         self.edges.retain(|edge| edge.nodes.iter().all(|&node_id| node_id != id));
     }
 
     pub fn remove_edge(&mut self, id: usize) {
         let edge = self.edges[id];
-        self.nodes[edge.nodes[0]]
-            .edges
-            .retain(|e| e.id != id);
-        self.nodes[edge.nodes[1]]
-            .edges
-            .retain(|e| e.id != id);
-        self.edges.swap_remove(id);
+        self.nodes[edge.nodes[0]].edges.retain(|&edge_id| edge_id != id);
+        self.nodes[edge.nodes[1]].edges.retain(|&edge_id| edge_id != id);
+        self.edges.remove(id);
     }
 }
 
