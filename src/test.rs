@@ -77,8 +77,30 @@ pub fn test_edge_removal() {
     assert_eq!(graph, target_graph);
 }
 
+pub fn test_remove_edge_between() {
+    let mut graph = Graph::new();
+    let mut target_graph = Graph::new();
+
+    graph.add_node();
+    graph.add_node();
+    graph.add_node();
+    graph.add_edge(0, 1);
+    graph.add_edge(1, 2);
+    graph.add_edge(2, 0);
+
+    target_graph.add_node();
+    target_graph.add_node();
+    target_graph.add_node();
+    target_graph.add_edge(0, 1);
+    target_graph.add_edge(2, 0);
+
+    graph.remove_edge_between(1, 2);
+
+    assert_eq!(graph, target_graph);
+}
+
 #[test]
-pub fn test_dicrected_node_removal() {
+pub fn test_directed_node_removal() {
     let mut graph = Graph::new();
     let mut target_graph = Graph::new();
 
@@ -159,4 +181,35 @@ pub fn test_get_edge_between() {
     assert_eq!(graph.get_edge_between(0, 1).unwrap().id, 0);
     assert_eq!(graph.get_edge_between(1, 2).unwrap().id, 1);
     assert_eq!(graph.get_edge_between(2, 0), None);
+}
+
+
+#[test]
+pub fn test_merge() {
+    let mut graph = Graph::new();
+    let mut other = Graph::new();
+
+    graph.add_node();
+    graph.add_node();
+    graph.add_node();
+    graph.add_edge(0, 1);
+    graph.add_edge(1, 2);
+
+    other.add_node();
+    other.add_node();
+    other.add_edge(0, 1);
+
+    let mut target_graph = Graph::new();
+    target_graph.add_node();
+    target_graph.add_node();
+    target_graph.add_node();
+    target_graph.add_node();
+    target_graph.add_node();
+    target_graph.add_edge(0, 1);
+    target_graph.add_edge(1, 2);
+    target_graph.add_edge(3, 4);
+
+    merge_graphs(&mut graph, &other);
+
+    assert_eq!(graph, target_graph);
 }

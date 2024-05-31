@@ -1,3 +1,5 @@
+use std::array;
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct Node {
     edges: Vec<usize>,
@@ -16,6 +18,11 @@ pub struct Edge {
     nodes: [usize; 2],
     id: usize,
     edge_type: EdgeType,
+}
+
+pub struct MergeMap {
+    nodes: Vec<[usize; 2]>,
+    edges: Vec<[usize; 2]>,
 }
 
 impl PartialEq for Edge {
@@ -115,12 +122,51 @@ impl Graph {
         self.nodes[edge.nodes[1]].edges.retain(|&edge_id| edge_id != id);
         self.edges.remove(id);
     }
+
+    pub fn remove_edge_between(&mut self, node1: usize, node2: usize) {
+        if let Some(edge_id) = self
+            .nodes[node1]
+            .edges
+            .iter()
+            .copied()
+            .find(|edge_id| {
+                let edge = &self.edges[*edge_id];
+                edge.nodes.iter().any(|&node_id| node_id == node2)
+            })
+        {
+            self.remove_edge(edge_id);
+        }
+    }
 }
 
 impl Default for Graph {
     fn default() -> Self {
         Self::new()
     }
+}
+
+pub fn merge_graphs(graph: &mut Graph, other: &Graph) -> MergeMap {
+    let mut merge_map = MergeMap {
+        nodes: Vec::new(),
+        edges: Vec::new(),
+    };
+
+    for node in &other.nodes {
+        merge_map.nodes.push([node.id, graph.add_node()]);
+    }
+
+    for edge in &other.edges {
+        let node1 = merge_map.nodes[edge.nodes[0]][1];
+        let node2 = merge_map.nodes[edge.nodes[1]][1];
+        let new_edge = if edge.edge_type == EdgeType::Directed {
+            graph.add_directed_edge(node1, node2)
+        } else {
+            graph.add_edge(node1, node2)
+        };
+        merge_map.edges.push([edge.id, new_edge]);
+    }
+
+    merge_map
 }
 
 #[cfg(test)]
