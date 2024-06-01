@@ -1,40 +1,20 @@
-use std::array;
-
 #[derive(Clone, Debug, PartialEq)]
 pub struct Node {
     edges: Vec<usize>,
     id: usize,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
-pub enum EdgeType {
-    Directed,
-    Undirected,
-}
-
 #[allow(dead_code)]
-#[derive(Copy, Clone, Debug, Eq)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub struct Edge {
     nodes: [usize; 2],
     id: usize,
-    edge_type: EdgeType,
 }
 
+#[derive(Clone, Debug, PartialEq)]
 pub struct MergeMap {
     nodes: Vec<[usize; 2]>,
     edges: Vec<[usize; 2]>,
-}
-
-impl PartialEq for Edge {
-    fn eq(&self, other: &Self) -> bool {
-        if self.nodes[0] == other.nodes[0] && self.nodes[1] == other.nodes[1] {
-            true
-        } else if self.edge_type == EdgeType::Undirected {
-            self.nodes[0] == other.nodes[1] && self.nodes[1] == other.nodes[0]
-        } else {
-            false
-        }
-    }
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -71,21 +51,9 @@ impl Graph {
         self.edges.push(Edge {
             nodes: [node1, node2],
             id,
-            edge_type: EdgeType::Undirected,
         });
         self.nodes[node1].edges.push(id);
         self.nodes[node2].edges.push(id);
-        id
-    }
-
-    pub fn add_directed_edge(&mut self, node1: usize, node2: usize) -> usize {
-        let id = self.edges.len();
-        self.edges.push(Edge {
-            nodes: [node1, node2],
-            id,
-            edge_type: EdgeType::Directed,
-        });
-        self.nodes[node1].edges.push(id);
         id
     }
 
@@ -158,11 +126,7 @@ pub fn merge_graphs(graph: &mut Graph, other: &Graph) -> MergeMap {
     for edge in &other.edges {
         let node1 = merge_map.nodes[edge.nodes[0]][1];
         let node2 = merge_map.nodes[edge.nodes[1]][1];
-        let new_edge = if edge.edge_type == EdgeType::Directed {
-            graph.add_directed_edge(node1, node2)
-        } else {
-            graph.add_edge(node1, node2)
-        };
+        let new_edge = graph.add_edge(node1, node2);
         merge_map.edges.push([edge.id, new_edge]);
     }
 
