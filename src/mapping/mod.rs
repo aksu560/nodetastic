@@ -6,11 +6,11 @@ pub enum MapType {
 }
 
 pub struct Map<T> {
-    map: HashMap<usize, T>,
+    map: HashMap<T, usize>,
     map_type: MapType,
 }
 
-impl<T> Map<T> {
+impl<T> Map<T> where T: Eq + std::hash::Hash{
     pub fn new(map_type: MapType) -> Self {
         Self {
             map: HashMap::new(),
@@ -18,24 +18,25 @@ impl<T> Map<T> {
         }
     }
 
-    pub fn insert(&mut self, id: usize, value: T) {
-        self.map.insert(id, value);
+    pub fn insert(&mut self, key: T, id: usize) {
+        self.map.insert(key, id);
     }
 
-    pub fn get(&self, id: usize) -> Option<&T> {
-        self.map.get(&id)
+    pub fn get(&self, key: T) -> Option<&usize> {
+        self.map.get(&key)
     }
 
-    pub fn remove(&mut self, id: usize) {
-        self.map.remove(&id);
+    pub fn remove(&mut self, key: T) {
+        self.map.remove(&key);
     }
 
     pub fn retain<F>(&mut self, mut f: F)
     where
-        F: FnMut(&usize, &T) -> bool,
+        F: FnMut(&T, &usize) -> bool,
     {
-        self.map.retain(|id, value| f(id, value));
+        self.map.retain(|key, value| f(key, value));
     }
+    
 }
 
 // map tests
