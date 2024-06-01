@@ -1,20 +1,15 @@
+#![allow(dead_code)]
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct Node {
     edges: Vec<usize>,
     id: usize,
 }
 
-#[allow(dead_code)]
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub struct Edge {
     nodes: [usize; 2],
     id: usize,
-}
-
-#[derive(Clone, Debug, PartialEq)]
-pub struct MergeMap {
-    nodes: Vec<[usize; 2]>,
-    edges: Vec<[usize; 2]>,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -113,25 +108,6 @@ impl Default for Graph {
     }
 }
 
-pub fn merge_graphs(graph: &mut Graph, other: &Graph) -> MergeMap {
-    let mut merge_map = MergeMap {
-        nodes: Vec::new(),
-        edges: Vec::new(),
-    };
-
-    for node in &other.nodes {
-        merge_map.nodes.push([node.id, graph.add_node()]);
-    }
-
-    for edge in &other.edges {
-        let node1 = merge_map.nodes[edge.nodes[0]][1];
-        let node2 = merge_map.nodes[edge.nodes[1]][1];
-        let new_edge = graph.add_edge(node1, node2);
-        merge_map.edges.push([edge.id, new_edge]);
-    }
-
-    merge_map
-}
-
 #[cfg(test)]
 mod test;
+mod mapping;
